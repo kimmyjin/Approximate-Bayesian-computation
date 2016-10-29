@@ -29,7 +29,13 @@ shinyApp(
       h4("Messages:"),
       textOutput("message1"),
       textOutput("message2"),
-      textOutput("message3")
+      textOutput("message3"),
+      br(),
+      actionButton("show", "Show True Value"),
+      h4("True Values:"),
+      shinyjs::hidden(
+        textOutput("true")
+      )
     )
   ),
   
@@ -61,12 +67,12 @@ shinyApp(
     
     post_samples = reactive({
       sock_sim()[, (sock_sim()[1,] == input$n_Odds)
-                     &
+                 &
                    (sock_sim()[2,] == input$n_Pairs)
                  ]
     })
     
-   #post_samples = sock_sim
+    #post_samples = sock_sim
     output$plot1 = renderPlot({
       hist(post_samples()[3,], freq = TRUE, breaks = 25, xlab = "Number of posterior socks",
            ylab = "Density Probablity", main="Posterior Socks Distribution")
@@ -98,6 +104,12 @@ shinyApp(
     output$message3 = renderText(
       paste("95% credible interval is(", round(quantile(post_samples()[3,], c(0.025)),2), 
             ",", round(quantile(post_samples()[3,], c(0.975)),2), ")")
+    )
+    observeEvent(input$show, {
+      toggle("true")
+    })
+    output$true = renderText(
+      paste("There were 21 pairs and 3 singletons")
     )
   },
   options = list(width = 1000)
