@@ -39,6 +39,7 @@ shinyServer = function(input, output) {
     par(mfrow=c(2,2))
     for(i in 1:4){
       hist(post_samples()[i,], freq = FALSE, breaks = 25, xlab=x[i],main= plot1name[i])
+      lines(density(post_samples()[i,]))
       if (any(input$checkGroup1=="mean")){
         abline(v=mean(post_samples()[i,]),col="red")
       }
@@ -61,6 +62,7 @@ shinyServer = function(input, output) {
     par(mfrow=c(2,2))
     for(i in 1:4){
       hist(sock_sim()[i,], freq = FALSE, breaks = 25, xlab=x[i],main= plot2name[i])
+      lines(density(sock_sim()[i,], adjust = 1.8))
       if (any(input$checkGroup2=="mean")){
         abline(v=mean(sock_sim()[i,]),col="red")
       }
@@ -90,7 +92,7 @@ shinyServer = function(input, output) {
       cc = c(cc,round(quantile(post_samples()[i,], 0.025),2))
       dd = c(dd,round(quantile(post_samples()[i,], 0.975),2))
     }
-    data.frame(x,"mean"=aa,"median"=bb,"95% interval"=cc,"95% interval"=dd)
+    data.frame(x,"mean"=aa,"median"=bb,"0.025_CI"=cc,"0.975_CI"=dd)
   })
   observeEvent(input$hideshow3, {
     # every time the button is pressed, alternate between hiding and showing the plot
@@ -109,7 +111,7 @@ shinyServer = function(input, output) {
       cc1 = c(cc1,round(quantile(sock_sim()[i,], 0.025),2))
       dd1 = c(dd1,round(quantile(sock_sim()[i,], 0.975),2))
     }
-    data.frame(x,"mean"=aa1,"median"=bb1,"95% interval"=cc1,"95% interval"=dd1)
+    data.frame(x,"mean"=aa1,"median"=bb1,"0.025_CI"=cc1,"0.975_CI"=dd1)
   })
   
   observeEvent(input$hideshow4, {
