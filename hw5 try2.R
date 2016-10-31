@@ -25,22 +25,23 @@ shinyApp(
                           actionButton("hideshow1", "Hide/show posterior distribution"),
                           checkboxGroupInput("checkGroup1", label = h5("posterior summary statistics"), 
                                              choices = list("mean", "median", "95% credible interval"="interval"),inline=TRUE),
-                          plotOutput("plot1"),
+                          shinyjs::hidden(plotOutput("plot1")),
                           actionButton("hideshow2", "Hide/show prior distribution"),
                           checkboxGroupInput("checkGroup2", label = h5("prior summary statistics"), 
                                              choices = list("mean", "median", "95% credible interval"="interval"),inline=TRUE),
-                          plotOutput("plot2")
+                          shinyjs::hidden(plotOutput("plot2"))
                         )),
                tabPanel("Summary Statistics",
                         actionButton("hideshow3", "Hide/show posterior summary statistics"),
                         fluidRow(column(3,
-                                        tableOutput('table1')
+                                        shinyjs::hidden(tableOutput('table1'))
                         )),
                         br(),
                         actionButton("hideshow4", "Hide/show prior summary statistics"),
                         fluidRow(column(3,
-                                        tableOutput('table2')
+                                        shinyjs::hidden(tableOutput('table2'))
                         )),
+                        br(),
                         actionButton("show", "Show True Value"),
                         h4("True Values:"),
                         shinyjs::hidden(
@@ -69,9 +70,6 @@ shinyApp(
         # Returning the parameters and counts of the number of matched 
         # and unique socks among those that were picked out.
         c(n_socks = n_socks,prop_pairs = prop_pairs,n_pairs = n_pairs, n_odds = n_odds,unique = sum(sock_counts == 1), pairs = sum(sock_counts == 2))
-        
-        # c(unique = sum(sock_counts == 1), pairs = sum(sock_counts == 2),
-        #   n_socks = n_socks, n_pairs = n_pairs, n_odds = n_odds, prop_pairs = prop_pairs)
       })
     })
     
