@@ -43,11 +43,9 @@ shinyApp(
                         )),
                         br(),
                         actionButton("show", "Show True Value"),
-                        h4("True Values:"),
-                        shinyjs::hidden(
-                          textOutput("true")
-                        )))
-  ),
+                        shinyjs::hidden(textOutput("true")
+                        )))),
+  
   server = function(input, output){
     # Generate simulated socks
     sock_sim = reactive({
@@ -166,7 +164,7 @@ shinyApp(
     })
     
     output$true = renderText(
-      paste("There were 21 pairs and 3 singletons")
+      paste("True values: There were 21 pairs and 3 singletons")
     )
     observeEvent(input$show, {
       toggle("true")
