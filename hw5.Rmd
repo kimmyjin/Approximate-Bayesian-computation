@@ -14,7 +14,7 @@ unique(number of singleton socks picked out), and pairs(number of pairs picked o
 Finally, we output the plots and summary statistics including mean, median and 95% confidence interval for each value inside sim_socks and post_samples. 
 
 ###Task 2 - We need speed. Speed’s what we need.
-
+The purpose of task 2 is to test how efficient our code is. In our original **ui.R** code, we used `replicate` to simulate the total number of socks. However, using `replicate` is very inefficient since it just treats our code as whole and puts into 1 core. When we adjust our prior parameters in our app, the appearance of updated graph is slow. Therefore, we decide to abandon the method `replicate` and to use `mcmapply` instead since it cuts our code into several parts and sends them to different cores, then puts the results back together. More specific, writing a function to generate one total number of socks, then set how many times to iterate and apply `mcmapply` on these functions. In this case, it takes much less times than only use 1 core which `replicate` does.  
 
 
 
