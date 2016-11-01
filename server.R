@@ -1,16 +1,20 @@
 library(shiny)
+library(parallel)
 
 shinyServer = function(input, output) {
   # Generate simulated socks
   sock_sim = reactive({
     # number of socks picked from laundry
     n_picked = 2*input$n_Pairs + input$n_Odds
-    
-    replicate(input$n_sims,{
+    prior_mu = input$prior_mu
+    prior_beta = input$prior_beta
+    prior_alpha = input$prior_alpha
+    prior_sd = input$prior_sd
+    sample_generate = function(i){
       # Generating a sample of the parameters from the priors
-      prior_size_param = -input$prior_mu^2 / (input$prior_mu - input$prior_sd^2)
-      n_socks = rnbinom(1, mu = input$prior_mu, size = prior_size_param)
-      prop_pairs = rbeta(1, shape1 = input$prior_alpha, shape2 = input$prior_beta)
+      prior_size_param = -prior_mu^2 / (prior_mu - prior_sd^2)
+      n_socks = rnbinom(1, mu = prior_mu, size = prior_size_param)
+      prop_pairs = rbeta(1, shape1 = prior_alpha, shape2 = prior_beta)
       n_pairs = round((floor(n_socks / 2)) * prop_pairs)
       n_odds = n_socks - n_pairs * 2
       
@@ -21,8 +25,11 @@ shinyServer = function(input, output) {
       
       # Returning the parameters and counts of the number of matched 
       # and unique socks among those that were picked out.
-      c(n_socks = n_socks,prop_pairs = prop_pairs,n_pairs = n_pairs, n_odds = n_odds,unique = sum(sock_counts == 1), pairs = sum(sock_counts == 2))
-    })
+      c(n_socks = n_socks,prop_pairs = prop_pairs,n_pairs = n_pairs, n_odds = n_odds,unique = sum(sock_counts == 1), 
+        pairs = sum(sock_counts == 2))
+    }
+    n =input$n_sims
+    mcmapply(sample_generate,seq_len(n),mc.cores =8)
   })
   
   post_samples = reactive({
