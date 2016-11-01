@@ -2,7 +2,6 @@ library(shiny)
 library(shinyjs)
 
 shinyUI(fluidPage(
-  
     titlePanel("How many socks in total in Karl Broman's laundry"),
     navbarPage("Team 6",
                tabPanel("Plots",
