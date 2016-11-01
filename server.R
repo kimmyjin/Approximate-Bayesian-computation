@@ -133,4 +133,4 @@ shinyServer = function(input, output) {
     toggle("true")
   })
 }
-#options = list(width = 1000)
+
