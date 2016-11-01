@@ -13,13 +13,17 @@ shinyServer = function(input, output) {
     sample_generate = function(i){
       # Generating a sample of the parameters from the priors
       prior_size_param = -prior_mu^2 / (prior_mu - prior_sd^2)
+      # generated number of total socks from negative binomial distribution
       n_socks = rnbinom(1, mu = prior_mu, size = prior_size_param)
+      # generated proration of pairs from beta distribution
       prop_pairs = rbeta(1, shape1 = prior_alpha, shape2 = prior_beta)
       n_pairs = round((floor(n_socks / 2)) * prop_pairs)
       n_odds = n_socks - n_pairs * 2
       
       # Simulating picking out n_picked socks
+      # assign 2 to pairs socks and 1 to singleton
       socks = rep(seq_len(n_pairs + n_odds), rep(c(2, 1), c(n_pairs, n_odds)))
+      # samples out picked socks from socks
       picked_socks = sample(socks, size =  min(n_picked, n_socks))
       sock_counts = table(picked_socks)
       
@@ -29,9 +33,11 @@ shinyServer = function(input, output) {
         pairs = sum(sock_counts == 2))
     }
     n =input$n_sims
-    mcmapply(sample_generate,seq_len(n),mc.cores =8)
+    # apply function sample_generate to each iteration
+    mcmapply(sample_generate,seq_len(n),mc.cores = 8)
   })
   
+  # generated post_samples subsetting from sock_sim
   post_samples = reactive({
     sock_sim()[, (sock_sim()[5,] == input$n_Odds)
                &
@@ -39,20 +45,24 @@ shinyServer = function(input, output) {
                ]
   })
   
-  #post_samples = sock_sim
+  # output plots
   output$plot1 = renderPlot({
     x = c("n_socks","prop_pairs","n_pairs","n_odd")
     plot1name = paste("posterior on",x)
     par(mfrow=c(2,2))
     for(i in 1:4){
+      #generate histogram and its density curve
       hist(post_samples()[i,], freq = FALSE, breaks = 25, xlab=x[i],main= plot1name[i])
       lines(density(post_samples()[i,]))
+      # generate mean values if mean is selected
       if (any(input$checkGroup1=="mean")){
         abline(v=mean(post_samples()[i,]),col="red")
       }
+      # generate median values if median is selected
       if (any(input$checkGroup1=="median")){
         abline(v=median(post_samples()[i,]),col="blue")
       }
+      # generate interval values if interval is selected
       if (any(input$checkGroup1=="interval")){
         abline(v=quantile(post_samples()[i,], c(0.025)),col="purple")
         abline(v=quantile(post_samples()[i,], c(0.975)),col="purple")
@@ -82,11 +92,12 @@ shinyServer = function(input, output) {
       }
     }
   })
+  # user click on hide/show button will hide or show plot2
   observeEvent(input$hideshow2, {
     # every time the button is pressed, alternate between hiding and showing the plot
     toggle("plot2")
   })
-  
+  # generate tabel from post_samples results 
   output$table1 = renderTable({
     aa = c()
     bb = c()
@@ -106,6 +117,7 @@ shinyServer = function(input, output) {
     toggle("table1")
   })
   
+  # generate table from sock_sim results
   output$table2 = renderTable({
     aa1 = c()
     bb1 = c()
